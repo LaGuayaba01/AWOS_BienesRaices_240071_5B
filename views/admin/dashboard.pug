@@ -1,0 +1,410 @@
+extends ../layout/index
+
+block contenido
+    .py-6
+
+        .mb-6.flex.items-center.justify-between
+            div
+                h1.text-2xl.font-extrabold.text-purple-700 Panel de Administración
+                .mt-2.bg-yellow-50.border.border-yellow-200.rounded-xl.px-4.py-2.inline-flex.items-center.gap-2
+                    span.text-yellow-500.text-sm ★
+                    p.text-sm.text-yellow-700 Bienvenido, usuario privilegiado&nbsp;
+                        strong= usuarioActual.name
+                    span.text-yellow-500.text-sm ★
+
+        //- ── Tarjetas de resumen ────────────────────────────────
+        .grid.gap-4.mb-8(class="sm:grid-cols-2 lg:grid-cols-3")
+
+            .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-5
+                p.text-xs.uppercase.text-gray-400.font-bold.mb-1 Total usuarios
+                p.text-3xl.font-extrabold.text-purple-700= stats.totalUsuarios
+                p.text-xs.text-gray-400.mt-1 Registrados en el sistema
+
+            .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-5
+                p.text-xs.uppercase.text-gray-400.font-bold.mb-1 Total propiedades
+                p.text-3xl.font-extrabold.text-purple-700= stats.totalPropiedades
+                .flex.gap-3.mt-2
+                    span.text-xs.text-green-600.font-medium= stats.totalActivas + ' activas'
+                    span.text-xs.text-gray-400.font-medium= stats.totalInactivas + ' inactivas'
+                    span.text-xs.text-blue-600.font-medium= stats.totalVendidas + ' vendidas'
+
+            .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-5
+                p.text-xs.uppercase.text-gray-400.font-bold.mb-1 Usuarios bloqueados
+                p.text-3xl.font-extrabold.text-red-500= stats.totalBloqueados
+                p.text-xs.text-gray-400.mt-1 Con bloqueo activo ahora mismo
+
+        //- ── Propiedades por estatus — barras ───────────────────
+        .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-5.mb-8
+            h2.text-sm.font-bold.text-gray-700.mb-4 Propiedades por estatus
+            .space-y-3
+                div
+                    .flex.justify-between.text-xs.text-gray-500.mb-1
+                        span Activas
+                        span= stats.totalActivas + ' / ' + stats.totalPropiedades
+                    .w-full.bg-gray-100.rounded-full.h-2
+                        div.bg-green-400.h-2.rounded-full(style=`width:${stats.totalPropiedades ? Math.round(stats.totalActivas/stats.totalPropiedades*100) : 0}%`)
+                div
+                    .flex.justify-between.text-xs.text-gray-500.mb-1
+                        span Inactivas
+                        span= stats.totalInactivas + ' / ' + stats.totalPropiedades
+                    .w-full.bg-gray-100.rounded-full.h-2
+                        div.bg-yellow-400.h-2.rounded-full(style=`width:${stats.totalPropiedades ? Math.round(stats.totalInactivas/stats.totalPropiedades*100) : 0}%`)
+                div
+                    .flex.justify-between.text-xs.text-gray-500.mb-1
+                        span Vendidas
+                        span= stats.totalVendidas + ' / ' + stats.totalPropiedades
+                    .w-full.bg-gray-100.rounded-full.h-2
+                        div.bg-blue-400.h-2.rounded-full(style=`width:${stats.totalPropiedades ? Math.round(stats.totalVendidas/stats.totalPropiedades*100) : 0}%`)
+
+        //- ── Ventas este mes + comparativa ──────────────────────
+        .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-5.mb-8
+            h2.text-sm.font-bold.text-gray-700.mb-4 Propiedades vendidas este mes
+            .flex.items-end.gap-6.mb-4
+                div
+                    p.text-4xl.font-extrabold.text-purple-700= ventas.esteMes
+                    p.text-xs.text-gray-400.mt-1 Este mes
+                div
+                    p.text-xl.font-bold.text-gray-400= ventas.mesAnterior
+                    p.text-xs.text-gray-400.mt-1 Mes anterior
+                div
+                    if ventas.tendencia === 'sube'
+                        span.text-green-600.font-bold.text-lg +#{ventas.variacion}%
+                        p.text-xs.text-green-500 ↑ Incremento
+                    else if ventas.tendencia === 'baja'
+                        span.text-red-500.font-bold.text-lg #{ventas.variacion}%
+                        p.text-xs.text-red-400 ↓ Reduccion
+                    else
+                        span.text-gray-400.font-bold.text-lg 0%
+                        p.text-xs.text-gray-400 Sin cambio
+
+            if ventas.top && ventas.top.length > 0
+                p.text-xs.uppercase.text-gray-400.font-bold.mb-2 Top 3 vendidas este mes
+                .space-y-2
+                    each p in ventas.top
+                        .flex.items-center.justify-between.bg-purple-50.rounded-xl.px-4.py-2
+                            div
+                                p.text-sm.font-medium.text-gray-800= p.titulo
+                                p.text-xs.text-gray-400= p.vendedor ? p.vendedor.name : 'Sin dueño'
+                            span.text-purple-600.text-sm.font-bold= '$' + Number(p.precio).toLocaleString('es-MX')
+
+        //- ── Gráficas D3 ────────────────────────────────────────
+        .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-5.mb-8
+            h2.text-sm.font-bold.text-gray-700.mb-2 Ventas históricas
+
+            //- Tabs para cambiar vista
+            .flex.gap-2.mb-4
+                button#btnMes(
+                    onclick="mostrarGrafica('mes')"
+                    class="text-xs px-4 py-1.5 rounded-full bg-purple-600 text-white font-medium transition-all duration-200"
+                ) Por mes
+                button#btnSemana(
+                    onclick="mostrarGrafica('semana')"
+                    class="text-xs px-4 py-1.5 rounded-full bg-gray-100 text-gray-500 font-medium transition-all duration-200"
+                ) Por semana
+                button#btnDia(
+                    onclick="mostrarGrafica('dia')"
+                    class="text-xs px-4 py-1.5 rounded-full bg-gray-100 text-gray-500 font-medium transition-all duration-200"
+                ) Por día (30 días)
+
+            svg#grafica-ventas(width="100%" height="220")
+
+        //- ── Lista de usuarios ──────────────────────────────────
+        .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-5.mb-8
+            .flex.items-center.justify-between.flex-wrap.gap-3.mb-4
+                h2.text-sm.font-bold.text-gray-700 Usuarios
+                form(method="GET" action="/admin" class="flex items-center gap-2 flex-wrap")
+                    .relative
+                        input(
+                            type="text"
+                            name="buscarU"
+                            value=buscarU
+                            placeholder="Nombre o email..."
+                            class="border border-gray-200 pl-7 pr-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-purple-400 w-44"
+                        )
+                        svg(xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-400 absolute left-2 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                            path(stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z")
+                    select(
+                        name="limU"
+                        onchange="this.form.submit()"
+                        class="border border-gray-200 px-2 py-1.5 rounded-lg text-xs focus:outline-none"
+                        style="color-scheme:light; background-color:#ffffff; color:#1f2937;"
+                    )
+                        option(value="10" selected=(limU===10)) 10
+                        option(value="20" selected=(limU===20)) 20
+                        option(value="50" selected=(limU===50)) 50
+                    input(type="hidden" name="pagP"     value=pagP)
+                    input(type="hidden" name="limP"     value=limP)
+                    input(type="hidden" name="buscarP"  value=buscarP)
+                    input(type="hidden" name="catP"     value=catP)
+                    input(type="hidden" name="estP"     value=estP)
+                    button(type="submit" class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg") Buscar
+
+            p.text-xs.text-gray-400.mb-3 Mostrando #{usuarios.length} de #{totalU} usuarios
+            .overflow-x-auto
+                table.w-full.text-sm
+                    thead
+                        tr.text-xs.uppercase.text-gray-400.border-b.border-gray-100
+                            th.text-left.pb-2.font-bold Nombre
+                            th.text-left.pb-2.font-bold Email
+                            th.text-center.pb-2.font-bold Rol
+                            th.text-center.pb-2.font-bold Confirmado
+                            th.text-center.pb-2.font-bold Estatus
+                            th.text-center.pb-2.font-bold Acción
+                    tbody
+                        each u in usuarios
+                            tr.border-b.border-gray-50
+                                td.py-2.text-gray-800= u.name
+                                td.py-2.text-gray-500.text-xs= u.email
+                                td.py-2.text-center
+                                    span(class="text-xs bg-purple-100 text-purple-700 px-2 rounded-full" style="padding-top:2px;padding-bottom:2px") Usuario
+                                td.py-2.text-center
+                                    if u.confirmed
+                                        span(class="text-xs bg-green-100 text-green-700 px-2 rounded-full" style="padding-top:2px;padding-bottom:2px") Sí
+                                    else
+                                        span(class="text-xs bg-yellow-100 text-yellow-700 px-2 rounded-full" style="padding-top:2px;padding-bottom:2px") No
+                                td.py-2.text-center
+                                    if u.regStatus
+                                        span(class="text-xs bg-green-100 text-green-700 px-2 rounded-full" style="padding-top:2px;padding-bottom:2px") Activo
+                                    else
+                                        span(class="text-xs bg-red-100 text-red-600 px-2 rounded-full" style="padding-top:2px;padding-bottom:2px") Inactivo
+                                td.py-2.text-center
+                                    form(method="POST" action=`/admin/usuarios/${u.id}/toggle`)
+                                        input(type="hidden" name="_csrf" value=csrfToken)
+                                        button(
+                                            type="submit"
+                                            class=`text-xs px-3 py-1 rounded-lg font-medium transition-all duration-200 ${u.regStatus ? 'border border-red-200 text-red-500 hover:bg-red-50' : 'border border-green-200 text-green-600 hover:bg-green-50'}`
+                                        )= u.regStatus ? 'Desactivar' : 'Activar'
+
+            //- Paginador usuarios
+            if totalPaginasU > 1
+                .mt-4.flex.items-center.justify-center.gap-1.flex-wrap
+                    if pagU > 1
+                        a(href=`/admin?pagU=${pagU-1}&limU=${limU}&buscarU=${encodeURIComponent(buscarU)}&pagP=${pagP}&limP=${limP}&buscarP=${encodeURIComponent(buscarP)}&catP=${catP}&estP=${estP}` class="text-xs border border-purple-200 text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg") ← Anterior
+                    - var iU = Math.max(1, pagU-2)
+                    - var fU = Math.min(totalPaginasU, pagU+2)
+                    - for (var n = iU; n <= fU; n++)
+                        if n === pagU
+                            span.text-xs.bg-purple-600.text-white.font-bold.px-3(style="padding-top:6px;padding-bottom:6px;border-radius:0.5rem")= n
+                        else
+                            a(href=`/admin?pagU=${n}&limU=${limU}&buscarU=${encodeURIComponent(buscarU)}&pagP=${pagP}&limP=${limP}&buscarP=${encodeURIComponent(buscarP)}&catP=${catP}&estP=${estP}` class="text-xs border border-purple-200 text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg")= n
+                    if pagU < totalPaginasU
+                        a(href=`/admin?pagU=${pagU+1}&limU=${limU}&buscarU=${encodeURIComponent(buscarU)}&pagP=${pagP}&limP=${limP}&buscarP=${encodeURIComponent(buscarP)}&catP=${catP}&estP=${estP}` class="text-xs border border-purple-200 text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg") Siguiente →
+
+        //- ── Lista de propiedades ────────────────────────────────
+        .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-5
+            .flex.items-center.justify-between.flex-wrap.gap-3.mb-4
+                h2.text-sm.font-bold.text-gray-700 Propiedades
+                form(method="GET" action="/admin" class="flex items-center gap-2 flex-wrap")
+                    .relative
+                        input(
+                            type="text"
+                            name="buscarP"
+                            value=buscarP
+                            placeholder="Título o ciudad..."
+                            class="border border-gray-200 pl-7 pr-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-purple-400 w-44"
+                        )
+                        svg(xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-400 absolute left-2 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                            path(stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z")
+                    select(
+                        name="catP"
+                        class="border border-gray-200 px-2 py-1.5 rounded-lg text-xs focus:outline-none"
+                        style="color-scheme:light; background-color:#ffffff; color:#1f2937;"
+                    )
+                        option(value="" selected=(!catP)) Categoría
+                        option(value="casa"         selected=(catP==='casa'))         Casa
+                        option(value="departamento" selected=(catP==='departamento')) Depto
+                        option(value="terreno"      selected=(catP==='terreno'))      Terreno
+                    select(
+                        name="estP"
+                        class="border border-gray-200 px-2 py-1.5 rounded-lg text-xs focus:outline-none"
+                        style="color-scheme:light; background-color:#ffffff; color:#1f2937;"
+                    )
+                        option(value="" selected=(!estP)) Estatus
+                        option(value="activa"   selected=(estP==='activa'))   Activa
+                        option(value="inactiva" selected=(estP==='inactiva')) Inactiva
+                    select(
+                        name="limP"
+                        onchange="this.form.submit()"
+                        class="border border-gray-200 px-2 py-1.5 rounded-lg text-xs focus:outline-none"
+                        style="color-scheme:light; background-color:#ffffff; color:#1f2937;"
+                    )
+                        option(value="10" selected=(limP===10)) 10
+                        option(value="20" selected=(limP===20)) 20
+                        option(value="50" selected=(limP===50)) 50
+                    input(type="hidden" name="pagU"    value=pagU)
+                    input(type="hidden" name="limU"    value=limU)
+                    input(type="hidden" name="buscarU" value=buscarU)
+                    button(type="submit" class="text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg") Buscar
+
+            p.text-xs.text-gray-400.mb-3 Mostrando #{propiedades.length} de #{totalP} propiedades
+            .overflow-x-auto
+                table.w-full.text-sm
+                    thead
+                        tr.text-xs.uppercase.text-gray-400.border-b.border-gray-100
+                            th.text-left.pb-2.font-bold Título
+                            th.text-left.pb-2.font-bold Dueño
+                            th.text-center.pb-2.font-bold Precio
+                            th.text-center.pb-2.font-bold Visibilidad
+                            th.text-center.pb-2.font-bold Acciones
+                    tbody
+                        each p in propiedades
+                            tr.border-b.border-gray-50
+                                td.py-2.text-gray-800= p.titulo
+                                td.py-2.text-gray-500.text-xs= p.vendedor ? p.vendedor.name : '-'
+                                td.py-2.text-center.text-purple-600.font-bold= '$' + Number(p.precio).toLocaleString('es-MX')
+                                td.py-2.text-center
+                                    form(method="POST" action=`/admin/propiedades/${p.id}/estatus` class="inline")
+                                        input(type="hidden" name="_csrf" value=csrfToken)
+                                        select(
+                                            name="estatus"
+                                            onchange="this.form.submit()"
+                                            class="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none"
+                                        )
+                                            option(value="activa"   selected=(p.estatus==='activa'))   Activa
+                                            option(value="inactiva" selected=(p.estatus==='inactiva')) Inactiva
+                                td.py-2.text-center
+                                    form(method="POST" action=`/admin/propiedades/${p.id}/eliminar` onsubmit="return confirm('¿Eliminar esta propiedad?')")
+                                        input(type="hidden" name="_csrf" value=csrfToken)
+                                        button(type="submit" class="text-xs border border-red-200 text-red-500 hover:bg-red-50 px-3 py-1 rounded-lg transition-all duration-200") Eliminar
+
+            //- Paginador propiedades
+            if totalPaginasP > 1
+                .mt-4.flex.items-center.justify-center.gap-1.flex-wrap
+                    if pagP > 1
+                        a(href=`/admin?pagP=${pagP-1}&limP=${limP}&buscarP=${encodeURIComponent(buscarP)}&catP=${catP}&estP=${estP}&pagU=${pagU}&limU=${limU}&buscarU=${encodeURIComponent(buscarU)}` class="text-xs border border-purple-200 text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg") ← Anterior
+                    - var iP = Math.max(1, pagP-2)
+                    - var fP = Math.min(totalPaginasP, pagP+2)
+                    - for (var m = iP; m <= fP; m++)
+                        if m === pagP
+                            span.text-xs.bg-purple-600.text-white.font-bold.px-3(style="padding-top:6px;padding-bottom:6px;border-radius:0.5rem")= m
+                        else
+                            a(href=`/admin?pagP=${m}&limP=${limP}&buscarP=${encodeURIComponent(buscarP)}&catP=${catP}&estP=${estP}&pagU=${pagU}&limU=${limU}&buscarU=${encodeURIComponent(buscarU)}` class="text-xs border border-purple-200 text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg")= m
+                    if pagP < totalPaginasP
+                        a(href=`/admin?pagP=${pagP+1}&limP=${limP}&buscarP=${encodeURIComponent(buscarP)}&catP=${catP}&estP=${estP}&pagU=${pagU}&limU=${limU}&buscarU=${encodeURIComponent(buscarU)}` class="text-xs border border-purple-200 text-purple-600 hover:bg-purple-50 px-3 py-1.5 rounded-lg") Siguiente →
+
+block scripts
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js")
+    script.
+        const datosMes    = !{graficas.porMes};
+        const datosSemana = !{graficas.porSemana};
+        const datosDia    = !{graficas.porDia};
+
+        let vistaActual = 'mes';
+
+        function mostrarGrafica(vista) {
+            vistaActual = vista;
+            ['mes','semana','dia'].forEach(v => {
+                const btn = document.getElementById('btn' + v.charAt(0).toUpperCase() + v.slice(1));
+                btn.className = v === vista
+                    ? 'text-xs px-4 py-1.5 rounded-full bg-purple-600 text-white font-medium transition-all duration-200'
+                    : 'text-xs px-4 py-1.5 rounded-full bg-gray-100 text-gray-500 font-medium transition-all duration-200';
+            });
+            const datos = vista === 'mes' ? datosMes : vista === 'semana' ? datosSemana : datosDia;
+            dibujar(datos);
+        }
+
+        function dibujar(datos) {
+            const svg    = d3.select('#grafica-ventas');
+            const W      = svg.node().getBoundingClientRect().width;
+            const H      = 220;
+            const margin = { top: 20, right: 20, bottom: 30, left: 30 };
+            const w      = W - margin.left - margin.right;
+            const h      = H - margin.top  - margin.bottom;
+
+            svg.selectAll('*').remove();
+            svg.attr('height', H);
+
+            if (!datos || datos.length === 0) {
+                svg.append('text')
+                    .attr('x', W / 2).attr('y', H / 2)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#9ca3af')
+                    .attr('font-size', '13px')
+                    .text('Sin datos para este periodo');
+                return;
+            }
+
+            const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const etiquetas = datos.map(d => d.etiqueta || d.periodo);
+            const valores   = datos.map(d => +d.total);
+            const maxVal    = d3.max(valores) || 1;
+
+            const x = d3.scaleBand().domain(etiquetas).range([0, w]).padding(0.3);
+            const y = d3.scaleLinear().domain([0, maxVal + 1]).range([h, 0]);
+
+            // Ejes
+            g.append('g').attr('transform', `translate(0,${h})`)
+                .call(d3.axisBottom(x).tickSize(0))
+                .call(g => g.select('.domain').remove())
+                .selectAll('text')
+                .attr('fill', '#9ca3af')
+                .attr('font-size', '11px');
+
+            g.append('g')
+                .call(d3.axisLeft(y).ticks(Math.min(maxVal, 5)).tickFormat(d3.format('d')).tickSize(-w))
+                .call(g => g.select('.domain').remove())
+                .call(g => g.selectAll('.tick line').attr('stroke', '#f3f4f6'))
+                .selectAll('text')
+                .attr('fill', '#9ca3af')
+                .attr('font-size', '11px');
+
+            // Línea
+            const linea = d3.line()
+                .x((d, i) => x(etiquetas[i]) + x.bandwidth() / 2)
+                .y(d => y(+d.total))
+                .curve(d3.curveMonotoneX);
+
+            g.append('path')
+                .datum(datos)
+                .attr('fill', 'none')
+                .attr('stroke', '#7c3aed')
+                .attr('stroke-width', 2.5)
+                .attr('d', linea);
+
+            // Area bajo la línea
+            const area = d3.area()
+                .x((d, i) => x(etiquetas[i]) + x.bandwidth() / 2)
+                .y0(h)
+                .y1(d => y(+d.total))
+                .curve(d3.curveMonotoneX);
+
+            g.append('path')
+                .datum(datos)
+                .attr('fill', '#7c3aed')
+                .attr('fill-opacity', 0.08)
+                .attr('d', area);
+
+            // Puntos
+            g.selectAll('circle')
+                .data(datos)
+                .join('circle')
+                .attr('cx', (d, i) => x(etiquetas[i]) + x.bandwidth() / 2)
+                .attr('cy', d => y(+d.total))
+                .attr('r', 5)
+                .attr('fill', '#7c3aed')
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2);
+
+            // Valores encima de cada punto
+            g.selectAll('.label')
+                .data(datos)
+                .join('text')
+                .attr('class', 'label')
+                .attr('x', (d, i) => x(etiquetas[i]) + x.bandwidth() / 2)
+                .attr('y', d => y(+d.total) - 10)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#7c3aed')
+                .attr('font-size', '11px')
+                .attr('font-weight', '600')
+                .text(d => d.total > 0 ? d.total : '');
+        }
+
+        // Dibujar al cargar
+        dibujar(datosMes);
+
+        // Redibujar si cambia el tamaño de ventana
+        window.addEventListener('resize', () => {
+            const datos = vistaActual === 'mes' ? datosMes : vistaActual === 'semana' ? datosSemana : datosDia;
+            dibujar(datos);
+        });

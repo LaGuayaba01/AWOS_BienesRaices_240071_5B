@@ -1,0 +1,218 @@
+extends ../layout/index
+
+block contenido
+    .py-6.mx-auto.max-w-4xl
+
+        //- Breadcrumb
+        .mb-4.flex.items-center.gap-2
+            a(href="/" style="color:#a78bfa; font-size:12px; text-decoration:none;") Inicio
+            svg(xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;color:#a78bfa;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                path(stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5")
+            a(href=`/categorias/${propiedad.categoria}` style="color:#a78bfa; font-size:12px; text-decoration:none; text-transform:capitalize;")= propiedad.categoria + 's'
+            svg(xmlns="http://www.w3.org/2000/svg" style="width:10px;height:10px;color:#a78bfa;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                path(stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5")
+            span(style="color:#6b7280; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px;")= propiedad.titulo
+
+        //- Encabezado
+        .mb-6.flex.items-start.justify-between.flex-wrap.gap-3
+            .flex.flex-col
+                h1.text-2xl.font-extrabold.text-purple-700= propiedad.titulo
+                .flex.items-center.gap-2.mt-1
+                    span(style=`font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; ${propiedad.estatus === 'activa' ? 'background:#dcfce7; color:#16a34a;' : propiedad.estatus === 'vendida' ? 'background:#dbeafe; color:#1d4ed8;' : 'background:#f3f4f6; color:#6b7280;'}`)
+                        = propiedad.estatus === 'activa' ? 'Disponible' : propiedad.estatus === 'vendida' ? 'Vendida' : 'Inactiva'
+                    span.text-xs.text-gray-400.capitalize= propiedad.categoria
+
+        .grid.gap-6(class="lg:grid-cols-3")
+
+            //- Columna izquierda — Galería + descripción
+            div(class="lg:col-span-2 flex flex-col gap-6")
+
+                //- Galería
+                .bg-white.rounded-2xl.shadow-md.overflow-hidden.border.border-purple-100
+                    if propiedad.imagenes && propiedad.imagenes.length > 0
+                        .relative
+                            img#imgPrincipal(
+                                src=propiedad.imagenes[0]
+                                alt=propiedad.titulo
+                                class="w-full object-cover"
+                                style="height:320px"
+                            )
+                            if propiedad.imagenes.length > 1
+                                span(class="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-lg")
+                                    | 1 /#{propiedad.imagenes.length}
+                        if propiedad.imagenes.length > 1
+                            .flex.gap-2.p-3.overflow-x-auto
+                                each img, i in propiedad.imagenes
+                                    img(
+                                        src=img
+                                        alt=`Imagen ${i + 1}`
+                                        class="w-16 h-16 object-cover rounded-xl cursor-pointer border-2 border-transparent hover:border-purple-400 transition-all duration-200 flex-shrink-0"
+                                        onclick=`cambiarImagen('${img}', ${i + 1})`
+                                    )
+                    else
+                        .bg-purple-50.flex.flex-col.items-center.justify-center(style="height:280px")
+                            svg(xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-purple-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M3 9.75L12 3l9 6.75V21a.75.75 0 01-.75.75H15a.75.75 0 01-.75-.75v-4.5h-4.5V21a.75.75 0 01-.75.75H3.75A.75.75 0 013 21V9.75z")
+                            p.text-gray-400.text-sm.mt-2 Sin imágenes
+
+                //- Descripción
+                .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-6
+                    h2.text-sm.font-bold.text-gray-700.uppercase.tracking-wide.mb-3 Descripción
+                    p.text-sm.text-gray-600.leading-relaxed= propiedad.descripcion
+
+                //- ── Formulario de Contacto ───────────────────────
+                .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-6
+
+                    .flex.items-center.gap-2.mb-5
+                        .w-8.h-8.rounded-xl.flex.items-center.justify-center(style="background:linear-gradient(135deg,#7c3aed,#6d28d9);")
+                            svg(xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:white;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75")
+                        div
+                            h2.font-bold.text-gray-800(style="font-size:15px;") Contactar al vendedor
+                            p.text-xs.text-gray-400 Envía un mensaje directo sobre esta propiedad
+
+                    //- Alerta de éxito / error
+                    if mensajeEnviado
+                        .flex.items-center.gap-3.mb-4.p-3.rounded-xl(style="background:#f0fdf4; border:1px solid #bbf7d0;")
+                            svg(xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#16a34a;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z")
+                            p(style="font-size:13px; color:#15803d; font-weight:500;") ¡Mensaje enviado! El vendedor se pondrá en contacto contigo pronto.
+
+                    if errorContacto
+                        .flex.items-center.gap-3.mb-4.p-3.rounded-xl(style="background:#fef2f2; border:1px solid #fecaca;")
+                            svg(xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#dc2626;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z")
+                            p(style="font-size:13px; color:#dc2626; font-weight:500;")= errorContacto
+
+                    form(method="POST" action=`/propiedad/${propiedad.id}/contacto`)
+                        input(type="hidden" name="_csrf" value=csrfToken)
+
+                        .grid.gap-3(class="sm:grid-cols-2")
+
+                            div
+                                label(for="nombre" style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;") Nombre *
+                                input(
+                                    type="text"
+                                    id="nombre"
+                                    name="nombre"
+                                    value=formData && formData.nombre || ''
+                                    placeholder="Tu nombre completo"
+                                    required
+                                    style="width:100%; border:1px solid #e9d5ff; border-radius:10px; padding:8px 12px; font-size:13px; color:#1f2937; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
+                                    onfocus="this.style.borderColor='#7c3aed'"
+                                    onblur="this.style.borderColor='#e9d5ff'"
+                                )
+
+                            div
+                                label(for="email" style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;") Email *
+                                input(
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value=formData && formData.email || ''
+                                    placeholder="tu@email.com"
+                                    required
+                                    style="width:100%; border:1px solid #e9d5ff; border-radius:10px; padding:8px 12px; font-size:13px; color:#1f2937; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
+                                    onfocus="this.style.borderColor='#7c3aed'"
+                                    onblur="this.style.borderColor='#e9d5ff'"
+                                )
+
+                        .mt-3
+                            label(for="telefono" style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;") Teléfono (opcional)
+                            input(
+                                type="tel"
+                                id="telefono"
+                                name="telefono"
+                                value=formData && formData.telefono || ''
+                                placeholder="55 1234 5678"
+                                style="width:100%; border:1px solid #e9d5ff; border-radius:10px; padding:8px 12px; font-size:13px; color:#1f2937; outline:none; box-sizing:border-box; transition:border-color 0.2s;"
+                                onfocus="this.style.borderColor='#7c3aed'"
+                                onblur="this.style.borderColor='#e9d5ff'"
+                            )
+
+                        .mt-3
+                            label(for="mensaje" style="display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px;") Mensaje *
+                            textarea(
+                                id="mensaje"
+                                name="mensaje"
+                                rows="4"
+                                placeholder="Hola, me interesa esta propiedad. ¿Podría darme más información?"
+                                required
+                                style="width:100%; border:1px solid #e9d5ff; border-radius:10px; padding:8px 12px; font-size:13px; color:#1f2937; outline:none; box-sizing:border-box; resize:vertical; transition:border-color 0.2s; font-family:inherit;"
+                                onfocus="this.style.borderColor='#7c3aed'"
+                                onblur="this.style.borderColor='#e9d5ff'"
+                            )= formData && formData.mensaje || ''
+
+                        .mt-4.flex.items-center.justify-between.flex-wrap.gap-3
+
+                            p(style="font-size:11px; color:#9ca3af;") * Campos obligatorios
+
+                            button(
+                                type="submit"
+                                style="background:linear-gradient(135deg,#7c3aed,#6d28d9); color:white; border:none; padding:9px 24px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; transition:opacity 0.2s;"
+                                onmouseover="this.style.opacity='0.88'"
+                                onmouseout="this.style.opacity='1'"
+                            )
+                                svg(xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                    path(stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5")
+                                | Enviar mensaje
+
+            //- Columna derecha
+            .flex.flex-col.gap-4
+
+                //- Precio
+                .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-6
+                    p.text-xs.text-gray-400.uppercase.font-bold.mb-1 Precio
+                    p.text-3xl.font-extrabold.text-purple-600= '$' + Number(propiedad.precio).toLocaleString('es-MX')
+
+                //- Características
+                .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-6
+                    h2.text-sm.font-bold.text-gray-700.uppercase.tracking-wide.mb-4 Características
+                    .grid.grid-cols-3.gap-3
+                        .flex.flex-col.items-center.bg-purple-50.rounded-xl.p-3
+                            svg(xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-purple-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25")
+                            span.text-lg.font-bold.text-gray-800= propiedad.habitaciones
+                            span.text-xs.text-gray-500 Hab.
+                        .flex.flex-col.items-center.bg-purple-50.rounded-xl.p-3
+                            svg(xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-purple-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6")
+                            span.text-lg.font-bold.text-gray-800= propiedad.banos
+                            span.text-xs.text-gray-500 Baños
+                        .flex.flex-col.items-center.bg-purple-50.rounded-xl.p-3
+                            svg(xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-purple-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12")
+                            span.text-lg.font-bold.text-gray-800= propiedad.estacionamientos
+                            span.text-xs.text-gray-500 Est.
+
+                //- Ubicación
+                .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-6
+                    h2.text-sm.font-bold.text-gray-700.uppercase.tracking-wide.mb-3 Ubicación
+                    .flex.items-start.gap-2
+                        svg(xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                            path(stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z")
+                            path(stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z")
+                        .flex.flex-col
+                            span.text-sm.font-medium.text-gray-700= propiedad.ciudad
+                            span.text-xs.text-gray-500= propiedad.direccion
+
+                //- Publicado
+                .bg-white.rounded-2xl.shadow-md.border.border-purple-100.p-6
+                    h2.text-sm.font-bold.text-gray-700.uppercase.tracking-wide.mb-2 Publicado
+                    p.text-sm.text-gray-600= new Date(propiedad.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+
+block scripts
+    script.
+        function cambiarImagen(src, num) {
+            const img = document.getElementById('imgPrincipal');
+            const contador = document.querySelector('[class*="bottom-3"]');
+            if (img) img.src = src;
+            if (contador) {
+                const total = document.querySelectorAll('[onclick^="cambiarImagen"]').length + 1;
+                contador.textContent = `${num} /${total}`;
+            }
+            document.querySelectorAll('[onclick^="cambiarImagen"]').forEach(t => {
+                t.classList.toggle('border-purple-500', t.getAttribute('onclick').includes(`'${src}'`));
+                t.classList.toggle('border-transparent', !t.getAttribute('onclick').includes(`'${src}'`));
+            });
+        }

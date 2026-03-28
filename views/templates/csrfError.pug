@@ -1,0 +1,45 @@
+extends ../layout/index
+
+block contenido
+    .py-6
+        h1.text-3xl.my-4.font-extrabold.text-center
+            span.text-purple-500 Bienes
+            span.font-normal Raíces
+
+    .mt-6.mx-auto.max-w-md
+        .rounded-2xl.shadow-2xl.p-8.text-center(class="bg-white dark:bg-gray-800" style="background:var(--card-bg, white)")
+
+            //- Icono
+            .flex.justify-center.mb-4
+                .w-16.h-16.rounded-full.flex.items-center.justify-center(style="background:rgba(239,68,68,0.1)")
+                    svg(xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                        path(stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z")
+
+            h2.text-lg.font-bold.mb-2 Sesión expirada
+            p.text-sm.mb-6(style="color:#6b7280") El formulario expiró o la sesión fue invalidada. Serás redirigido al inicio de sesión automáticamente.
+
+            //- Barra de progreso
+            .w-full.rounded-full.overflow-hidden.mb-4(style="height:6px; background:#e5e7eb")
+                #barra.rounded-full.bg-red-400(style="height:6px; width:100%; transition: width linear")
+
+            p.text-xs(style="color:#9ca3af") Redirigiendo en #[span#cuenta 5] segundos...
+
+block scripts
+    script.
+        const segundos = 5;
+        let restante  = segundos;
+        const barra   = document.getElementById('barra');
+        const cuenta  = document.getElementById('cuenta');
+
+        barra.style.transition = `width ${segundos}s linear`;
+        barra.getBoundingClientRect();
+        barra.style.width = '0%';
+
+        const intervalo = setInterval(() => {
+            restante--;
+            cuenta.textContent = restante;
+            if (restante <= 0) {
+                clearInterval(intervalo);
+                window.location.href = '/auth/login';
+            }
+        }, 1000);

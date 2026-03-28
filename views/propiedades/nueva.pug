@@ -1,0 +1,287 @@
+extends ../layout/index
+
+block contenido
+    .py-6.mx-auto.max-w-2xl
+
+        .mb-6.flex.items-center.gap-3
+            a(href="/propiedades" class="text-purple-400 hover:text-purple-600 transition-colors duration-200")
+                svg(xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                    path(stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18")
+            h1.text-2xl.font-extrabold.text-purple-700 Nueva Propiedad
+
+        if errores
+            each error in errores
+                span(data-alerta-error=error.msg style="display:none")
+
+        .bg-white.rounded-2xl.shadow-md.p-6
+
+            form(method="POST" action=`/propiedades/nueva?_csrf=${csrfToken}` enctype="multipart/form-data" noValidate)
+
+                .grid.gap-4(class="sm:grid-cols-2")
+
+                    div(class="sm:col-span-2")
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="titulo") Título
+                        input#titulo(
+                            type="text"
+                            name="titulo"
+                            value= propiedad.titulo || ''
+                            placeholder="Casa en Polanco"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm placeholder-gray-400 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )
+
+                    div(class="sm:col-span-2")
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="descripcion") Descripción
+                        textarea#descripcion(
+                            name="descripcion"
+                            rows="3"
+                            placeholder="Descripcion de la propiedad..."
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm placeholder-gray-400 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )= propiedad.descripcion || ''
+
+                    div
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="precio") Precio (MXN)
+                        input#precio(
+                            type="number"
+                            name="precio"
+                            value= propiedad.precio || ''
+                            placeholder="2500000"
+                            min="0"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm placeholder-gray-400 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )
+
+                    div
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="categoria") Categoría
+                        select#categoria(
+                            name="categoria"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )
+                            option(value="" disabled selected) Selecciona una categoria
+                            option(value="casa" selected=(propiedad.categoria === 'casa')) Casa
+                            option(value="departamento" selected=(propiedad.categoria === 'departamento')) Departamento
+                            option(value="terreno" selected=(propiedad.categoria === 'terreno')) Terreno
+
+                    div
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="habitaciones") Habitaciones
+                        input#habitaciones(
+                            type="number"
+                            name="habitaciones"
+                            value= propiedad.habitaciones || 1
+                            min="1"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )
+
+                    div
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="banos") Baños
+                        input#banos(
+                            type="number"
+                            name="banos"
+                            value= propiedad.banos || 1
+                            min="1"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )
+
+                    div
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="estacionamientos") Estacionamientos
+                        input#estacionamientos(
+                            type="number"
+                            name="estacionamientos"
+                            value= propiedad.estacionamientos || 0
+                            min="0"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )
+
+                    div
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="ciudad") Ciudad
+                        input#ciudad(
+                            type="text"
+                            name="ciudad"
+                            value= propiedad.ciudad || ''
+                            placeholder="Ciudad de Mexico"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm placeholder-gray-400 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )
+
+                    div(class="sm:col-span-2")
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="direccion") Dirección
+                        input#direccion(
+                            type="text"
+                            name="direccion"
+                            value= propiedad.direccion || ''
+                            placeholder="Av. Ejemplo 123, Col. Centro"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm placeholder-gray-400 hover:border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none transition-all duration-200"
+                        )
+
+                    div(class="sm:col-span-2")
+                        label.block.text-xs.uppercase.text-gray-400.mb-1.font-bold(for="imagenes") Imágenes (máximo 5, JPG/PNG/WebP)
+                        input#imagenes(
+                            type="file"
+                            name="imagenes"
+                            multiple
+                            accept="image/jpeg,image/png,image/webp"
+                            class="w-full border border-purple-200 px-3 py-2 rounded-xl text-sm text-gray-500 hover:border-purple-400 focus:border-purple-500 focus:outline-none transition-all duration-200 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200"
+                        )
+                        p.text-xs.text-gray-400.mt-1 Puedes seleccionar hasta 5 imagenes a la vez
+
+                .flex.justify-end.gap-3.mt-6
+                    a(href="/propiedades" class="border border-gray-200 text-gray-500 hover:bg-gray-50 text-sm font-medium px-6 py-2 rounded-xl transition-all duration-200") Cancelar
+                    input(
+                        type="submit"
+                        value="Guardar Propiedad"
+                        class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-6 py-2 rounded-xl cursor-pointer transition-all duration-200"
+                    )
+
+block scripts
+    script.
+        // ── Validación del formulario ──────────────────────────────
+        const form = document.querySelector('form');
+
+        const mostrarError = (input, msg) => {
+            input.classList.add('border-red-400');
+            input.classList.remove('border-purple-200');
+            let err = input.parentElement.querySelector('.campo-error');
+            if (!err) {
+                err = document.createElement('p');
+                err.className = 'campo-error text-xs text-red-500 mt-1';
+                input.parentElement.appendChild(err);
+            }
+            err.textContent = msg;
+        };
+
+        const limpiarError = (input) => {
+            input.classList.remove('border-red-400');
+            input.classList.add('border-purple-200');
+            const err = input.parentElement.querySelector('.campo-error');
+            if (err) err.remove();
+        };
+
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            el.addEventListener('input',  () => limpiarError(el));
+            el.addEventListener('change', () => limpiarError(el));
+        });
+
+        form.addEventListener('submit', (e) => {
+            let valido = true;
+
+            const titulo          = document.getElementById('titulo');
+            const descripcion     = document.getElementById('descripcion');
+            const precio          = document.getElementById('precio');
+            const categoria       = document.getElementById('categoria');
+            const habitaciones    = document.getElementById('habitaciones');
+            const banos           = document.getElementById('banos');
+            const estacionamientos = document.getElementById('estacionamientos');
+            const ciudad          = document.getElementById('ciudad');
+            const direccion       = document.getElementById('direccion');
+
+            if (!titulo.value.trim()) {
+                mostrarError(titulo, 'El título es obligatorio.'); valido = false;
+            } else if (titulo.value.trim().length < 3) {
+                mostrarError(titulo, 'Mínimo 3 caracteres.'); valido = false;
+            } else if (titulo.value.trim().length > 150) {
+                mostrarError(titulo, 'Máximo 150 caracteres.'); valido = false;
+            }
+
+            if (!descripcion.value.trim()) {
+                mostrarError(descripcion, 'La descripción es obligatoria.'); valido = false;
+            } else if (descripcion.value.trim().length < 10) {
+                mostrarError(descripcion, 'Mínimo 10 caracteres.'); valido = false;
+            }
+
+            const precioVal = parseFloat(precio.value);
+            if (!precio.value || isNaN(precioVal)) {
+                mostrarError(precio, 'El precio es obligatorio.'); valido = false;
+            } else if (precioVal <= 0) {
+                mostrarError(precio, 'El precio debe ser mayor a 0.'); valido = false;
+            } else if (precioVal > 9999999999.99) {
+                mostrarError(precio, 'El precio excede el máximo permitido.'); valido = false;
+            }
+
+            if (!categoria.value) {
+                mostrarError(categoria, 'Selecciona una categoría.'); valido = false;
+            }
+
+            const habVal = parseInt(habitaciones.value, 10);
+            if (!habitaciones.value || isNaN(habVal)) {
+                mostrarError(habitaciones, 'Las habitaciones son obligatorias.'); valido = false;
+            } else if (habVal < 1 || habVal > 50) {
+                mostrarError(habitaciones, 'Debe ser entre 1 y 50.'); valido = false;
+            }
+
+            const banosVal = parseInt(banos.value, 10);
+            if (!banos.value || isNaN(banosVal)) {
+                mostrarError(banos, 'Los baños son obligatorios.'); valido = false;
+            } else if (banosVal < 1 || banosVal > 20) {
+                mostrarError(banos, 'Debe ser entre 1 y 20.'); valido = false;
+            }
+
+            const estVal = parseInt(estacionamientos.value, 10);
+            if (estacionamientos.value === '' || isNaN(estVal)) {
+                mostrarError(estacionamientos, 'Campo obligatorio.'); valido = false;
+            } else if (estVal < 0 || estVal > 20) {
+                mostrarError(estacionamientos, 'Debe ser entre 0 y 20.'); valido = false;
+            }
+
+            if (!ciudad.value.trim()) {
+                mostrarError(ciudad, 'La ciudad es obligatoria.'); valido = false;
+            } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-\.]+$/.test(ciudad.value.trim())) {
+                mostrarError(ciudad, 'Solo se permiten letras.'); valido = false;
+            }
+
+            if (!direccion.value.trim()) {
+                mostrarError(direccion, 'La dirección es obligatoria.'); valido = false;
+            } else if (direccion.value.trim().length < 5) {
+                mostrarError(direccion, 'Mínimo 5 caracteres.'); valido = false;
+            }
+
+            if (!valido) e.preventDefault();
+        });
+
+        // ── Auto-corrección de campos numéricos ───────────────────
+        const camposNumericos = [
+            { id: 'habitaciones',    min: 1,  max: 50 },
+            { id: 'banos',           min: 1,  max: 20 },
+            { id: 'estacionamientos', min: 0, max: 20 }
+        ];
+
+        camposNumericos.forEach(({ id, min, max }) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            // Bloquear letras
+            el.addEventListener('keypress', e => {
+                if (!/[0-9]/.test(e.key)) e.preventDefault();
+            });
+            el.addEventListener('paste', e => e.preventDefault());
+
+            // Auto-corregir al escribir
+            el.addEventListener('input', () => {
+                let val = parseInt(el.value, 10);
+                if (isNaN(val)) return;
+                if (val < min) { el.value = min; val = min; }
+                if (val > max) { el.value = max; val = max; }
+
+                // Feedback visual suave
+                el.classList.remove('border-purple-200', 'border-green-400');
+                el.classList.add('border-green-400');
+                clearTimeout(el._timer);
+                el._timer = setTimeout(() => {
+                    el.classList.remove('border-green-400');
+                    el.classList.add('border-purple-200');
+                }, 800);
+            });
+
+            // Corregir también al salir del campo
+            el.addEventListener('blur', () => {
+                let val = parseInt(el.value, 10);
+                if (isNaN(val) || val < min) el.value = min;
+                if (val > max) el.value = max;
+            });
+        });
+
+        // Solo números y punto decimal en precio
+        document.getElementById('precio').addEventListener('keypress', e => {
+            if (!/[0-9.]/.test(e.key)) e.preventDefault();
+        });
+
+        // Solo letras en ciudad
+        document.getElementById('ciudad').addEventListener('keypress', e => {
+            if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s\-\.]/.test(e.key)) e.preventDefault();
+        });

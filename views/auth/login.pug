@@ -1,0 +1,79 @@
+extends ../layout/index 
+
+block contenido
+    .py-4
+
+        h1(style="font-size:26px;font-weight:800;text-align:center;color:#38bdf8")
+            | Bienes
+            span(style="color:#0f172a;font-weight:400") Raíces
+
+        h2(style="text-align:center;font-size:13px;color:#64748b")
+            | Ingresa a tu cuenta
+
+        if errores
+            each error in errores
+                span(data-alerta-error=error.msg style="display:none")
+
+        if mensaje
+            span(data-alerta-exito=mensaje style="display:none")
+
+        .mt-6.mx-auto(style="max-width:420px;")
+
+            .bg-white(style="padding:20px;border-radius:12px;border:1px solid #e2e8f0;")
+
+                form#formLogin(method="POST" action="/auth/login" noValidate)
+                    input(type="hidden" name="_csrf" value=csrfToken)
+
+                    // EMAIL
+                    div(style="margin-bottom:12px")
+                        label(style="font-size:11px;color:#64748b;font-weight:bold") Correo electrónico
+
+                        input(
+                            type="email"
+                            name="emailUsuario"
+                            placeholder="correo@dominio.com"
+                            style="width:100%;border:1px solid #cbd5e1;padding:8px;border-radius:6px;font-size:13px;"
+                        )
+
+                    // PASSWORD
+                    div(style="margin-bottom:12px")
+                        label(style="font-size:11px;color:#64748b;font-weight:bold") Contraseña
+
+                        input(
+                            type="password"
+                            name="passwordUsuario"
+                            placeholder="Tu contraseña"
+                            style="width:100%;border:1px solid #cbd5e1;padding:8px;border-radius:6px;font-size:13px;"
+                        )
+
+                    // BOTÓN LOGIN
+                    div(style="text-align:center;margin-top:15px")
+                        button(
+                            type="submit"
+                            style="background:#38bdf8;color:white;padding:8px 20px;border:none;border-radius:20px;font-size:13px;cursor:pointer;"
+                        ) Iniciar sesión
+
+                // DIVISOR
+                div(style="margin:20px 0;text-align:center;font-size:12px;color:#94a3b8")
+                    | O continuar con
+
+                .grid(style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px")
+                a(
+                href="/auth/linkedin"
+                style="background:#0a66c2;color:white;padding:8px;border-radius:6px;text-align:center;font-size:12px;text-decoration:none;"
+                ) LinkedIn
+
+                a(
+                    href="/auth/twitter"
+                    style="background:#0ea5e9;color:white;padding:8px;border-radius:6px;text-align:center;font-size:12px;text-decoration:none;"
+                    ) Twitter
+
+                a(
+                    href="/auth/github"
+                    style="background:#0f172a;color:white;padding:8px;border-radius:6px;text-align:center;font-size:12px;text-decoration:none;"
+                    ) GitHub
+
+                // LINKS
+                div(style="display:flex;justify-content:space-between;margin-top:15px;font-size:11px")
+                    a(href="/auth/registro" style="color:#38bdf8;text-decoration:none") Crear cuenta
+                    a(href="/auth/recuperarPassword" style="color:#38bdf8;text-decoration:none") ¿Olvidaste tu contraseña?

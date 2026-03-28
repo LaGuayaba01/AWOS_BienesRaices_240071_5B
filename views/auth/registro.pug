@@ -1,0 +1,130 @@
+extends ../layout/index 
+
+block contenido
+    .py-4
+        h1(style="font-size:26px;font-weight:800;text-align:center;color:#38bdf8")
+            | Bienes
+            span(style="color:white;font-weight:400") Raíces
+
+        h2(style="text-align:center;font-size:13px;color:#94a3b8") Crea tu cuenta correctamente
+
+        if errores
+            each error in errores
+                span(data-alerta-error=error.msg style="display:none")
+
+        if mensaje
+            span(data-alerta-exito=mensaje style="display:none")
+
+        if query && query.csrf
+            span(data-alerta-advertencia="La sesión expiró. Intenta nuevamente." style="display:none")
+
+        .mt-6.mx-auto(style="max-width:420px;")
+
+            .bg-white.rounded-xl.shadow-md(style="padding:20px;")
+
+                form#formRegistro(method="POST" action="/auth/registro" noValidate)
+                    input(type="hidden" name="_csrf" value=csrfToken)
+
+                    // NOMBRE
+                    div(style="margin-bottom:12px")
+                        label(for="nombreUsuario" style="font-size:11px;color:#6b7280;font-weight:bold") Nombre completo
+
+                        input#nombreUsuario(
+                            type="text"
+                            name="nombreUsuario"
+                            value= Usuario ? Usuario.nombreUsuario : ''
+                            placeholder="Ej: Juan Pérez"
+                            style="width:100%;border:1px solid #e5e7eb;padding:6px 10px;border-radius:6px;font-size:13px;"
+                            oninput="this.value=this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]/g,'')"
+                        )
+
+                        p#err-nombre.hidden(style="color:red;font-size:11px")
+
+                    // EMAIL
+                    div(style="margin-bottom:12px")
+                        label(for="emailUsuario" style="font-size:11px;color:#6b7280;font-weight:bold") Correo electrónico
+
+                        input#emailUsuario(
+                            type="email"
+                            name="emailUsuario"
+                            value= Usuario ? Usuario.emailUsuario : ''
+                            placeholder="correo@dominio.com"
+                            style="width:100%;border:1px solid #e5e7eb;padding:6px 10px;border-radius:6px;font-size:13px;"
+                        )
+
+                        p#err-email.hidden(style="color:red;font-size:11px")
+
+                    // PASSWORD
+                    div(style="margin-bottom:12px")
+                        label(for="passwordUsuario" style="font-size:11px;color:#6b7280;font-weight:bold") Contraseña
+
+                        .relative(style="position:relative")
+                            input#passwordUsuario(
+                                type="password"
+                                name="passwordUsuario"
+                                placeholder="Mínimo 8 caracteres"
+                                style="width:100%;border:1px solid #e5e7eb;padding:6px 10px;border-radius:6px;font-size:13px;"
+                            )
+
+                            button(
+                                type="button"
+                                onclick="togglePasswordGroup(this)"
+                                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#9ca3af;cursor:pointer;"
+                            ) 👁
+
+                        p#err-password.hidden(style="color:red;font-size:11px")
+
+                    // CONFIRMACION
+                    div(style="margin-bottom:12px")
+                        label(for="confirmacionUsuario" style="font-size:11px;color:#6b7280;font-weight:bold") Confirmar contraseña
+
+                        .relative(style="position:relative")
+                            input#confirmacionUsuario(
+                                type="password"
+                                name="confirmacionUsuario"
+                                placeholder="Repite la contraseña"
+                                style="width:100%;border:1px solid #e5e7eb;padding:6px 10px;border-radius:6px;font-size:13px;"
+                            )
+
+                            button(
+                                type="button"
+                                onclick="togglePasswordGroup(this)"
+                                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#9ca3af;cursor:pointer;"
+                            ) 👁
+
+                        p#err-confirmacion.hidden(style="color:red;font-size:11px")
+
+                    // BOTÓN
+                    div(style="text-align:center;margin-top:15px")
+                        input(
+                            type="submit"
+                            value="Crear Cuenta"
+                            style="background:#2563eb;color:white;padding:8px 20px;border:none;border-radius:20px;font-size:13px;cursor:pointer;"
+                            onmouseover="this.style.background='#1d4ed8'"
+                            onmouseout="this.style.background='#2563eb'"
+                        )
+
+                    // LINKS
+                    div(style="display:flex;justify-content:space-between;margin-top:12px;font-size:11px")
+                        a(href="/auth/login" style="color:#2563eb;text-decoration:none") ¿Ya tienes cuenta?
+                        a(href="/auth/recuperarPassword" style="color:#2563eb;text-decoration:none") ¿Olvidaste tu contraseña?
+
+    // SCRIPTS DIRECTOS (SIN block scripts)
+    script(src="/js/registro.js")
+    script(src="/js/offline-registro.js")
+    script.
+        document.getElementById('formRegistro').addEventListener('submit', function() {
+            sessionStorage.setItem('br-form-nombre', document.getElementById('nombreUsuario').value);
+            sessionStorage.setItem('br-form-email', document.getElementById('emailUsuario').value);
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var nombre = sessionStorage.getItem('br-form-nombre');
+            var email  = sessionStorage.getItem('br-form-email');
+
+            if (nombre) document.getElementById('nombreUsuario').value = nombre;
+            if (email) document.getElementById('emailUsuario').value = email;
+
+            sessionStorage.removeItem('br-form-nombre');
+            sessionStorage.removeItem('br-form-email');
+        });
