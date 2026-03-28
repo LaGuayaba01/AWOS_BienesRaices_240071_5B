@@ -1,0 +1,106 @@
+extends ../layout/index
+
+block contenido
+
+    .w-full(style="background:#f8fafc; min-height:100vh; padding:15px;")
+
+        if success
+            span(data-alerta-exito=success style="display:none")
+
+        // ───────────── FILTROS ─────────────
+        form(method="GET" action="/" style="margin-bottom:15px;")
+            input(type="hidden" name="buscar" value=buscar)
+            input(type="hidden" name="limite" value=limite)
+
+            .bg-white(style="border:1px solid #e2e8f0; border-radius:12px; padding:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;")
+
+                span(style="font-size:12px; color:#64748b; font-weight:600") Filtrar
+
+                each cat in ['', 'casa', 'departamento', 'terreno']
+                    - const labels = { '': 'Todas', casa: 'Casas', departamento: 'Deptos', terreno: 'Terrenos' }
+                    - const activo = categoriaActiva === cat
+                    button(
+                        type="submit"
+                        name="categoria"
+                        value=cat
+                        style=activo
+                            ? "background:#38bdf8;color:white;border:none;padding:5px 12px;border-radius:20px;font-size:12px;"
+                            : "background:#f1f5f9;color:#334155;border:none;padding:5px 12px;border-radius:20px;font-size:12px;"
+                    )= labels[cat]
+
+                .flex-1
+
+                select(
+                    name="limite"
+                    onchange="this.form.submit()"
+                    style="border:1px solid #e2e8f0;padding:4px 8px;border-radius:6px;font-size:12px;background:white;"
+                )
+                    option(value="6" selected=(limite===6)) 6
+                    option(value="12" selected=(limite===12)) 12
+                    option(value="24" selected=(limite===24)) 24
+
+        // ───────────── TITULO + BUSCADOR ─────────────
+        .mb-4(style="background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;")
+            h1(style="font-size:22px;font-weight:bold;color:#0f172a") Propiedades disponibles
+            p(style="font-size:13px;color:#64748b") Encuentra tu propiedad ideal
+
+            form(method="GET" action="/").mt-2
+                .flex(style="gap:8px; margin-top:10px;")
+                    input(
+                        type="text"
+                        name="buscar"
+                        value=buscar
+                        placeholder="Buscar..."
+                        style="flex:1;border:1px solid #cbd5e1;padding:8px;border-radius:6px;font-size:13px;background:white;"
+                    )
+                    button(
+                        type="submit"
+                        style="background:#38bdf8;color:white;padding:8px 16px;border:none;border-radius:6px;font-size:13px;"
+                        onmouseover="this.style.background='#0ea5e9'"
+                        onmouseout="this.style.background='#38bdf8'"
+                    ) Buscar
+
+        // ───────────── RESULTADOS ─────────────
+        if propiedades && propiedades.length > 0
+
+            .grid(style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:15px;")
+
+                each p in propiedades
+                    .bg-white(style="border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; transition:0.2s;"
+                        onmouseover="this.style.boxShadow='0 10px 25px rgba(0,0,0,0.08)'"
+                        onmouseout="this.style.boxShadow='none'"
+                    )
+
+                        .relative(style="height:170px")
+                            if p.imagenes && p.imagenes.length > 0
+                                img(src=p.imagenes[0] alt=p.titulo style="width:100%;height:100%;object-fit:cover;")
+                            else
+                                .w-full.h-full.flex.items-center.justify-center(style="background:#f1f5f9")
+                                    span(style="color:#94a3b8;font-size:12px") Sin imagen
+
+                            span(style="position:absolute;top:8px;left:8px;background:#38bdf8;color:white;font-size:10px;padding:3px 8px;border-radius:20px;")= p.categoria
+
+                        .p-3
+                            h3(style="font-size:14px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;")= p.titulo
+
+                            p(style="font-size:12px;color:#64748b;margin-bottom:6px")= p.ciudad
+
+                            .flex(style="gap:10px;font-size:11px;color:#64748b;margin-bottom:8px")
+                                span= p.habitaciones + ' hab'
+                                span= p.banos + ' baños'
+                                if p.estacionamientos > 0
+                                    span= p.estacionamientos + ' est'
+
+                            .flex(style="justify-content:space-between;align-items:center")
+                                span(style="color:#22c55e;font-weight:700")
+                                    = '$' + Number(p.precio).toLocaleString('es-MX')
+
+                                a(
+                                    href=`/propiedad/${p.id}`
+                                    style="background:#38bdf8;color:white;padding:5px 12px;border-radius:6px;font-size:12px;text-decoration:none;"
+                                ) Ver
+
+        else
+            .text-center(style="padding:60px 0;")
+                h2(style="color:#334155;font-weight:bold") Sin resultados
+                p(style="color:#94a3b8") Intenta con otros filtros

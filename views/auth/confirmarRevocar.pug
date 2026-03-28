@@ -1,0 +1,38 @@
+extends ../layout/index
+
+block contenido
+    .py-4
+        h1.text-3xl.my-3.font-extrabold.text-center.text-purple-600 Bienes
+            span.font-normal.text-gray-800 Raíces
+        h2.text-center.text-base.font-normal.text-gray-500 Seguridad de cuenta
+
+        .mt-6.mx-auto.max-w-xl
+            .bg-white.py-7.px-6.shadow-2xl.rounded-2xl
+
+                .flex.justify-center.mb-4
+                    .w-16.h-16.rounded-full.bg-red-50.flex.items-center.justify-center
+                        svg(xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                            path(stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z")
+
+                h3.text-center.text-lg.font-bold.text-gray-800.mb-2 ¿Está seguro que desea eliminar su cuenta?
+
+                p.text-center.text-sm.text-gray-500.mb-6.leading-relaxed
+                    | Esta acción es 
+                    strong.text-red-500 permanente e irreversible.
+                    |  Se eliminarán todos sus datos, sesiones y cuentas sociales vinculadas.
+
+                .bg-red-50.border.border-red-200.rounded-xl.px-4.py-3.mb-6
+                    p.text-xs.text-red-600.text-center.leading-relaxed
+                        | Si usted 
+                        strong sí realizó
+                        |  el acceso que recibió por correo, simplemente cierre esta página. Su cuenta está segura.
+
+                form(method="POST" action=`/auth/loginSocial/revocar/${token}` noValidate)
+                    input(type="hidden" name="_csrf" value=csrfToken)
+                    .px-2
+                        input(
+                            type="submit"
+                            value="Sí, eliminar mi cuenta definitivamente"
+                            class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl text-sm cursor-pointer transition-colors duration-200"
+                        )
+

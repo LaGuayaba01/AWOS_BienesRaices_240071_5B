@@ -1,0 +1,41 @@
+extends ../layout/index
+
+block contenido
+    .py-4
+        h1.text-3xl.my-3.font-extrabold.text-center.text-purple-600 Bienes
+            span.font-normal.text-gray-800 Raíces
+        h2.text-center.text-base.font-normal.text-gray-500 Desbloqueo de cuenta
+
+        .mt-6.mx-auto.max-w-xl
+            .bg-white.py-7.px-6.shadow-2xl.rounded-2xl
+
+                .flex.justify-center.mb-4
+                    .w-16.h-16.rounded-full.bg-purple-50.flex.items-center.justify-center
+                        svg(xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                            path(stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z")
+
+                h3.text-center.text-lg.font-bold.text-gray-800.mb-2 Desbloquear cuenta
+
+                p.text-center.text-sm.text-gray-500.mb-6.leading-relaxed
+                    | Hola&nbsp;
+                    strong.text-purple-600= nombre
+                    | , ¿confirmas que fuiste tú quien realizó los intentos de acceso?
+                    |  Al confirmar, tu cuenta quedará desbloqueada de inmediato.
+
+                .bg-purple-50.border.border-purple-200.rounded-xl.px-4.py-3.mb-6
+                    p.text-xs.text-purple-600.text-center.leading-relaxed
+                        | Si alguien más intentó acceder a tu cuenta, te recomendamos
+                        strong  cambiar tu contraseña
+                        |  después de desbloquearla.
+
+                form(method="POST" action=`/auth/desbloquear/${token}` noValidate)
+                    input(type="hidden" name="_csrf" value=csrfToken)
+                    .px-2
+                        input(
+                            type="submit"
+                            value="Sí, desbloquear mi cuenta"
+                            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-xl text-sm cursor-pointer transition-colors duration-200"
+                        )
+
+                .mt-3.text-center
+                    a(href="/auth/login" class="text-purple-400 text-xs hover:text-purple-600 hover:underline") Cancelar, ir al login
