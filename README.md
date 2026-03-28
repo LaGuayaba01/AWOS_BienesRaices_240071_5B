@@ -21,8 +21,8 @@ El proyecto estará basado en una Arquitectura SOA (Service Oriented Architectur
 |3.| Layouts, Template Engines y Tailwind CSS (Frontend)| 5 |Finalizado  |
 |4.| Creación de páginas de Login y Creación de Usuarios| 3 |Finalizado  |
 |5.| ORM's y Bases de Datos | 07 | Finalizado |
-|6.| Insertando Registros en la Tabla Usuarios| ❌ | ❌ |
-|7.| Implementación de la Fucnionalidad (Feature) Recuperación de Contraseña (Password Recovery)| ❌ | ❌ |
+|6.| Insertando Registros en la Tabla Usuarios| 4 | Finalizado |
+|7.| Implementación de la Fucnionalidad (Feature) Recuperación de Contraseña (Password Recovery)| 2 | Finalizado |
 |10.| Operaciones CRUD (Create, Read, Update, Delete) de las Propuedades | ❌ | ❌ |
 |11.| Proteción de Rutas y Validación de Tokes de Sesión (JWT) | ❌ | ❌ |
 |12.| Añadir Imágenes a la Propiedad (Gestión de Archivos) | ❌ | ❌ |
@@ -72,4 +72,4 @@ JWL_SECRET=UTXJ-ti/2026/BienesRaices-240071/Yhos/YHMR@tacosDsal
 
 
 ### Creado por: 
-Su nombre completo aquí Yhostin Manuel Ramirez Gonzalez - 240071. se creo punto de guardado
+Su nombre completo aquí Yhostin Manuel Ramirez Gonzalez - 240071. 
