@@ -72,4 +72,4 @@ JWL_SECRET=UTXJ-ti/2026/BienesRaices-240071/Yhos/YHMR@tacosDsal
 
 
 ### Creado por: 
-Su nombre completo aquí Yhostin Manuel Ramirez Gonzalez - 240071.
+Su nombre completo aquí Yhostin Manuel Ramirez Gonzalez - 240071. se creo punto de guardado
